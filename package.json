@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-vue-autoclass",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Auto generate tail-wind style class for vue",
   "main": "index.js",
   "scripts": {
@@ -15,5 +15,6 @@
     "auto-generate"
   ],
   "author": "Tarzan Dong",
+  "git": "https://github.com/tarzandong/autoCSSClass.git",
   "license": "ISC"
 }

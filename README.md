@@ -12,47 +12,55 @@ Then the plugin will generate the css class '.w88 { width: 88px }' in '/src/auto
 import {autoClassPlugin} from 'vite-plugin-vue-autoclass'
 
 export default defineConfig({
-  plugins: [vue(), autoClassPlugin()],
+  plugins: [vue(), autoClassPlugin({
+    mainjsFile: 'main.ts'
+  })],
   ...
 )}
 ```
 
 # 2 Config
 
-Will offer the style key map config in recently future. Now you can use the default map as bellow:
+You can use options param. the default options as bellow:
 
 ```
-  {
-    w: {key: 'width'},
-    h: {key: 'height'},
-    lh: {key: 'line-height'},
-    minh: {key: 'min-height'},
-    minw: {key: 'min-width'},
-    maxh: {key: 'max-height'},
-    maxw: {key: 'max-width'},
-    vw: {key: 'width', unit:'vw'},
-    vh: {key: 'height', unit: 'vh'},
-    pw: {key: 'width', unit: '%'},
-    ph: {key: 'height', unit: '%'},
-    p: {key: 'padding'},
-    pl: {key: 'padding-left'},
-    pr: {key: 'padding-right'},
-    pt: {key: 'padding-top'},
-    pb: {key: 'padding-bottom'},
-    m: {key: 'margin'},
-    ml: {key: 'margin-left'},
-    mr: {key: 'margin-right'},
-    mt: {key: 'margin-top'},
-    mb: {key: 'margin-bottom'},
-    fs: {key: 'font-size'},
-    bdr:{key: 'border-radius'},
-    bdrtl:{key: 'border-top-left-radius'},
-    bdrtr:{key: 'border-top-right-radius'},
-    bdrbl:{key: 'border-bottom-left-radius'},
-    bdrbr:{key: 'border-bottom-right-radius'},
-    op: {key: 'opacity', unit:'%'},
-    z: {key: 'z-index', unit:''},
-    fl: {key: 'flex':, unit ''}
+  const defaultOptions = {
+    cssFile : 'auto.css', 
+    mainUnit: 'px',
+    mainjsFile: 'main.js', 
+    refreshInit: true, // 当设为 true, dev启动时会手动刷新页面一次，以响应项目未启动时vue页面代码新增的css类
+    classTypes: {
+      w: {key: 'width', unit},  //unit 取值为传入的mainUnit
+      h: {key: 'height', unit},
+      lh: {key: 'line-height', unit},
+      minh: {key: 'min-height', unit},
+      minw: {key: 'min-width', unit},
+      maxh: {key: 'max-height', unit},
+      maxw: {key: 'max-width', unit},
+      vw: {key: 'width', unit:'vw'},
+      vh: {key: 'height', unit: 'vh'},
+      pw: {key: 'width', unit: '%'},
+      ph: {key: 'height', unit: '%'},
+      p: {key: 'padding', unit},
+      pl: {key: 'padding-left', unit},
+      pr: {key: 'padding-right', unit},
+      pt: {key: 'padding-top', unit},
+      pb: {key: 'padding-bottom', unit},
+      m: {key: 'margin', unit},
+      ml: {key: 'margin-left', unit},
+      mr: {key: 'margin-right', unit},
+      mt: {key: 'margin-top', unit},
+      mb: {key: 'margin-bottom', unit},
+      fs: {key: 'font-size', unit},
+      bdr:{key: 'border-radius', unit},
+      bdrtl:{key: 'border-top-left-radius', unit},
+      bdrtr:{key: 'border-top-right-radius', unit},
+      bdrbl:{key: 'border-bottom-left-radius', unit},
+      bdrbr:{key: 'border-bottom-right-radius', unit},
+      op: {key: 'opacity', unit:'%'},
+      z: {key: 'z-index', unit:''},
+      fl: {key: 'flex', unit: ''}
+    }
   }
 ```
 
