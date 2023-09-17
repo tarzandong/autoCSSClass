@@ -51,7 +51,7 @@ export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFil
   let init = true
   return {
     //插件名字
-    name:'vite-plugin-vue-autoClass',
+    name:'vite-plugin-autoClass',
     enforce: "pre",
     // configResolved(resolvedConfig) {
     //   config = resolvedConfig;
@@ -61,13 +61,29 @@ export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFil
     
     transform(code,id){
       // console.log(id)
-      
-      if (id.substring(id.length-4) == '.vue') {
+      if (id.substring(id.length - mainjsFile.length) == mainjsFile) {
+        if (!autoCSSFile) {
+          const tempPath = id.substring(0, id.length - mainjsFile.length)
+          autoCSSFile = tempPath + (cssFile? cssFile : 'auto.css')
+          if (!fs.existsSync(autoCSSFile)) fs.writeFileSync(autoCSSFile,'')  
+        }
+
+        code = `import './${cssFile? cssFile : 'auto.css'}'
+        ${code}
+        if (import.meta.hot) {
+          import.meta.hot.on('refresh', ()=>{
+            console.log('refresh')
+            window.location.reload()
+          })
+        }
+        `
+      }
+      else if (['.vue', '.jsx', '.tsx'].includes(id.substring(id.length-4))) {
         if (!autoCSSFile) return code
         autoClassContent = fs.readFileSync(autoCSSFile)
-        const templateStr = code.substring(code.indexOf('<template>'), code.indexOf('</template>'))
-        const classStr1 = templateStr.match(/class=".*?"/g) ?? []
-        const classStr2 = templateStr.match(/class='.*?'/g) ?? []
+        const templateStr = id.substring(id.length-4) == '.vue' ? code.substring(code.indexOf('<template>'), code.indexOf('</template>')) : code.substring(code.indexOf('return'))
+        const classStr1 = id.substring(id.length-4) == '.vue' ? (templateStr.match(/class=".*?"/g) ?? []) : (templateStr.match(/className=".*?"/g) ?? [])
+        const classStr2 = id.substring(id.length-4) == '.vue' ? (templateStr.match(/class='.*?'/g) ?? []) : (templateStr.match(/className='.*?'/g) ?? [])
         let classArr = classStr1.concat(classStr2).reduce((pre,cur)=>{
           return pre.concat(cur.split(/[ '"]/).filter(item=>{
             return /\d+$/.test(item)
@@ -92,23 +108,7 @@ export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFil
         //写入单个vue组件文件中，此方法造成代码冗余，放弃
         // code = code.replace('</style>', contentStr + '' + hStr + '  </style>')
       }
-      else if (id.substring(id.length - mainjsFile.length) == mainjsFile) {
-        if (!autoCSSFile) {
-          const tempPath = id.substring(0, id.length - mainjsFile.length)
-          autoCSSFile = tempPath + (cssFile? cssFile : 'auto.css')
-          if (!fs.existsSync(autoCSSFile)) fs.writeFileSync(autoCSSFile,'')  
-        }
-
-        code = `import './${cssFile? cssFile : 'auto.css'}'
-        ${code}
-        if (import.meta.hot) {
-          import.meta.hot.on('refresh', ()=>{
-            console.log('refresh')
-            window.location.reload()
-          })
-        }
-        `
-      }
+      
       return code;
     },
     handleHotUpdate(ctx) {

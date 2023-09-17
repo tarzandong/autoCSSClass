@@ -1,4 +1,4 @@
-This is a vite pluging for vue project.
+This is a vite pluging for vue/React project.
 
 With it you can add some post-css style class in template tag. like follow code:
 ``` <div class="w88"></div> ```
