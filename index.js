@@ -1,13 +1,12 @@
 
 import fs from 'fs'
 
-export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFile:'', refreshInit: true}){
+export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFile:''}){
   let {cssFile, mainUnit, classTypes, mainjsFile, refreshInit} = options
   const unit = mainUnit? mainUnit : 'px'
   const defaultOptions = {
     cssFile : 'auto.css', mainUnit: 'px',
     mainjsFile: 'main.js', 
-    refreshInit: true, // 当设为 true, dev启动时会手动刷新页面一次，以响应项目未启动时vue页面代码新增的css类
     classTypes: {
       w: {key: 'width', unit},
       h: {key: 'height', unit},
@@ -121,7 +120,7 @@ export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFil
       // 姿势 1: 在 Vite 内置中间件之前执行
       server.middlewares.use((req, res, next) => {
         // console.log(req.url)        
-        if (req.url=='/refresh' && init && refreshInit) {
+        if (req.url=='/refresh' && init) {
           init = false
           server.ws.send({
             type: 'custom',
