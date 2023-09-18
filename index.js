@@ -70,6 +70,12 @@ export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFil
 
         code = `import './${cssFile? cssFile : 'auto.css'}'
         ${code}
+        window.addEventListener("load", function () {
+          console.log('loaded')
+          let xhr = new XMLHttpRequest()
+          xhr.open('GET', '/refresh')
+          xhr.send()
+        })
         if (import.meta.hot) {
           import.meta.hot.on('refresh', ()=>{
             console.log('refresh')
@@ -111,17 +117,19 @@ export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFil
       
       return code;
     },
-    handleHotUpdate(ctx) {
-      if (ctx.file == autoCSSFile && init && refreshInit) {
-        console.log('refresh css')
-        init = false
-        setTimeout(() => {
-          ctx.server.ws.send({
+    configureServer(server) {
+      // 姿势 1: 在 Vite 内置中间件之前执行
+      server.middlewares.use((req, res, next) => {
+        // console.log(req.url)        
+        if (req.url=='/refresh' && init && refreshInit) {
+          init = false
+          server.ws.send({
             type: 'custom',
             event: 'refresh'
           })
-        }, 1000);
-      }
+        }
+        next()
+      })
     }
   }
 }

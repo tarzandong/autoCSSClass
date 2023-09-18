@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-autoclass",
-  "version": "1.0.2",
+  "version": "1.0.5",
   "description": "Auto generate post-css style class for your project",
   "main": "index.js",
   "scripts": {
