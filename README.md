@@ -25,12 +25,11 @@ You can use options param. the default options as bellow:
 
 ```
   const defaultOptions = {
-    cssFile : 'auto.css', 
+    cssFile : 'auto.css',  //the generate css file name, the path will be '/src'
     mainUnit: 'px',
-    mainjsFile: 'main.js', 
-    refreshInit: true, // 当设为 true, dev启动时会手动刷新页面一次，以响应项目未启动时vue页面代码新增的css类
+    mainjsFile: 'main.js', //the Vue/React entry file name
     classTypes: {
-      w: {key: 'width', unit},  //unit 取值为传入的mainUnit
+      w: {key: 'width', unit},
       h: {key: 'height', unit},
       lh: {key: 'line-height', unit},
       minh: {key: 'min-height', unit},
@@ -59,7 +58,11 @@ You can use options param. the default options as bellow:
       bdrbr:{key: 'border-bottom-right-radius', unit},
       op: {key: 'opacity', unit:'%'},
       z: {key: 'z-index', unit:''},
-      fl: {key: 'flex', unit: ''}
+      fl: {key: 'flex', unit: ''},
+      lft: {key: 'left', unit},
+      rgt: {key: 'right', unit},
+      top: {key: 'top', unit},
+      btm: {key: 'bottom', unit}
     }
   }
 ```

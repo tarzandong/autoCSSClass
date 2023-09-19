@@ -37,7 +37,11 @@ export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFil
       bdrbr:{key: 'border-bottom-right-radius', unit},
       op: {key: 'opacity', unit:'%'},
       z: {key: 'z-index', unit:''},
-      fl: {key: 'flex', unit: ''}
+      fl: {key: 'flex', unit: ''},
+      lft: {key: 'left', unit},
+      rgt: {key: 'right', unit},
+      top: {key: 'top', unit},
+      btm: {key: 'bottom', unit}
     }
   }
   if (!cssFile) cssFile = defaultOptions.cssFile
@@ -75,12 +79,6 @@ export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFil
           xhr.open('GET', '/refresh')
           xhr.send()
         })
-        if (import.meta.hot) {
-          import.meta.hot.on('refresh', ()=>{
-            console.log('refresh')
-            window.location.reload()
-          })
-        }
         `
       }
       else if (['.vue', '.jsx', '.tsx'].includes(id.substring(id.length-4))) {
@@ -122,9 +120,9 @@ export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFil
         // console.log(req.url)        
         if (req.url=='/refresh' && init) {
           init = false
-          server.ws.send({
-            type: 'custom',
-            event: 'refresh'
+          server.moduleGraph.urlToModuleMap.forEach((value, key)=>{
+            if (key.includes(cssFile))
+            server.reloadModule(value)
           })
         }
         next()
