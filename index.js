@@ -50,6 +50,7 @@ export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFil
 
   // let config
   let autoClassContent = ''
+  let allClassName = []
   let autoCSSFile
   let init = true
   return {
@@ -70,7 +71,13 @@ export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFil
           autoCSSFile = tempPath + (cssFile? cssFile : 'auto.css')
           if (!fs.existsSync(autoCSSFile)) fs.writeFileSync(autoCSSFile,'')  
         }
-
+        
+        let ignoreContent = fs.readFileSync('./.gitignore', 'utf-8')
+        if (!ignoreContent.includes(cssFile)) {
+          ignoreContent = cssFile+'\n'+ignoreContent
+        }
+        fs.writeFileSync('./.gitignore',ignoreContent)
+        
         code = `import './${cssFile? cssFile : 'auto.css'}'
         ${code}
         window.addEventListener("load", function () {
@@ -96,12 +103,14 @@ export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFil
         const autoClasss = [...(new Set(classArr))]
         const contentStr = autoClasss.reduce((pre, cur)=>{
           const label = cur.replaceAll(/\d+/g, '')
+          if (classTypes[label] && !allClassName.includes(`.${cur}`)) allClassName.push(`.${cur}`)
           if ( !classTypes[label] || autoClassContent.includes(cur) ) return pre
-          let c = `.${cur} {
-            ${classTypes[label].key}: ${cur.replaceAll(/\D+/g, '')}${classTypes[label].unit}
-          }`
-          return pre+`
-          ${c}`
+          let c = 
+`.${cur} {
+  ${classTypes[label].key}: ${cur.replaceAll(/\D+/g, '')}${classTypes[label].unit}
+}`
+return pre+`
+${c}`
         }, '')
         autoClassContent += contentStr
         if (contentStr) {
@@ -120,6 +129,13 @@ export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFil
         // console.log(req.url)        
         if (req.url=='/refresh' && init) {
           init = false
+          const tempContent = fs.readFileSync(autoCSSFile, 'utf-8')
+          const tempContentArr = tempContent.split('}\n')
+          const finalArr = tempContentArr.reduce((pre, cur)=>{
+            if (allClassName.includes(cur.split(' ').find(item=>{return item !== ''}))) pre.push(cur.trim())
+            return pre
+          }, [])
+          fs.writeFileSync(autoCSSFile, finalArr.join('}\n'))
           server.moduleGraph.urlToModuleMap.forEach((value, key)=>{
             if (key.includes(cssFile))
             server.reloadModule(value)
