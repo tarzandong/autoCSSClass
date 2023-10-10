@@ -68,3 +68,9 @@ You can use options param. the default options as bellow:
 ```
 
 For example: class="mb20" => .mb20 { margin-bottom: 20px }
+
+# 3 Notice
+
+For match correct class/classname, please make sure the correct spell in '.vue/.jsx' for these words bellow:
+  '<template>' '</template>' 'class=' 'className='
+If those words have any empty ' ' inserted in, will miss-match some css class.

@@ -48,7 +48,7 @@ export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFil
   if (!classTypes) classTypes = defaultOptions.classTypes 
   if (!mainjsFile) mainjsFile = defaultOptions.mainjsFile
 
-  // let config
+  let config
   let autoClassContent = ''
   let allClassName = []
   let autoCSSFile
@@ -57,12 +57,16 @@ export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFil
     //插件名字
     name:'vite-plugin-autoClass',
     enforce: "pre",
-    // configResolved(resolvedConfig) {
-    //   config = resolvedConfig;
-    //   console.log(config.build)
-    //   autoCSSFile = config.root + '/src/' + (cssFile? cssFile : 'auto.css')
-    // },
-    
+    configResolved(resolvedConfig) {
+      config = resolvedConfig
+    },
+    transformIndexHtml(html) {
+      if (config.env.PROD) {
+        //生产环境引入 auto.css的方法
+        return html.replace('</head', `\t<link rel="stylesheet" href="/${config.build.assetsDir}/${cssFile}">\n\t</head`)
+      }
+      else return html
+    },
     transform(code,id){
       // console.log(id)
       if (id.substring(id.length - mainjsFile.length) == mainjsFile) {
@@ -71,27 +75,35 @@ export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFil
           autoCSSFile = tempPath + (cssFile? cssFile : 'auto.css')
           if (!fs.existsSync(autoCSSFile)) fs.writeFileSync(autoCSSFile,'')  
         }
-        
-        let ignoreContent = fs.readFileSync('./.gitignore', 'utf-8')
-        if (!ignoreContent.includes(cssFile)) {
-          ignoreContent = cssFile+'\n'+ignoreContent
+      
+        //由于auto.css为自动生成，每个项目成员开发者都有可能生成新的不同的css类，容易产生代码冲突，所以在gitignore中将其屏蔽
+        if (fs.existsSync('./.gitignore')) {
+          let ignoreContent = fs.readFileSync('./.gitignore', 'utf-8')
+          if (!ignoreContent.includes(cssFile)) {
+            ignoreContent = cssFile+'\n'+ignoreContent
+          }
+          fs.writeFileSync('./.gitignore',ignoreContent) 
         }
-        fs.writeFileSync('./.gitignore',ignoreContent)
         
-        code = `import './${cssFile? cssFile : 'auto.css'}'
-        ${code}
-        window.addEventListener("load", function () {
-          console.log('loaded')
-          let xhr = new XMLHttpRequest()
-          xhr.open('GET', '/refresh')
-          xhr.send()
-        })
-        `
+        
+        if (config.env.DEV) {
+          //开发环境引入 auto.css的方法是在main.js中，以便于hrm
+          code = `import './${cssFile? cssFile : 'auto.css'}'
+          ${code}
+          window.addEventListener("load", function () {
+            console.log('loaded')
+            let xhr = new XMLHttpRequest()
+            xhr.open('GET', '/refresh')
+            xhr.send()
+          })
+          `
+        }
+        
       }
       else if (['.vue', '.jsx', '.tsx'].includes(id.substring(id.length-4))) {
         if (!autoCSSFile) return code
         autoClassContent = fs.readFileSync(autoCSSFile)
-        const templateStr = id.substring(id.length-4) == '.vue' ? code.substring(code.indexOf('<template>'), code.indexOf('</template>')) : code.substring(code.indexOf('return'))
+        const templateStr = id.substring(id.length-4) == '.vue' ? code.substring(code.indexOf('<template>'), code.lastIndexOf('</template>')) : code.substring(code.indexOf('return'))
         const classStr1 = id.substring(id.length-4) == '.vue' ? (templateStr.match(/class=".*?"/g) ?? []) : (templateStr.match(/className=".*?"/g) ?? [])
         const classStr2 = id.substring(id.length-4) == '.vue' ? (templateStr.match(/class='.*?'/g) ?? []) : (templateStr.match(/className='.*?'/g) ?? [])
         let classArr = classStr1.concat(classStr2).reduce((pre,cur)=>{
@@ -143,6 +155,12 @@ ${c}`
         }
         next()
       })
+    },
+    closeBundle() {
+      if (config.env.PROD) {
+        //生产环境打包时将auto.css拷贝至输出文件夹的assets中
+        fs.copyFileSync(autoCSSFile, `./${config.build.outDir}/${config.build.assetsDir}/${cssFile}`)
+      }
     }
   }
 }
