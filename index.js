@@ -2,7 +2,7 @@
 import fs from 'fs'
 
 export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFile:''}){
-  let {cssFile, mainUnit, classTypes, mainjsFile, refreshInit} = options
+  let {cssFile, mainUnit, classTypes, mainjsFile} = options
   const unit = mainUnit? mainUnit : 'px'
   const defaultOptions = {
     cssFile : 'auto.css', mainUnit: 'px',
@@ -90,12 +90,14 @@ export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFil
           //开发环境引入 auto.css的方法是在main.js中，以便于hrm
           code = `import './${cssFile? cssFile : 'auto.css'}'
           ${code}
-          window.addEventListener("load", function () {
-            console.log('loaded')
-            let xhr = new XMLHttpRequest()
-            xhr.open('GET', '/refresh')
-            xhr.send()
-          })
+          if (window) {
+            window.addEventListener("load", function () {
+              console.log('loaded')
+              let xhr = new XMLHttpRequest()
+              xhr.open('GET', '/refresh')
+              xhr.send()
+            })
+          }
           `
         }
         
@@ -107,7 +109,7 @@ export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFil
         const classStr1 = id.substring(id.length-4) == '.vue' ? (templateStr.match(/class=".*?"/g) ?? []) : (templateStr.match(/className=".*?"/g) ?? [])
         const classStr2 = id.substring(id.length-4) == '.vue' ? (templateStr.match(/class='.*?'/g) ?? []) : (templateStr.match(/className='.*?'/g) ?? [])
         let classArr = classStr1.concat(classStr2).reduce((pre,cur)=>{
-          return pre.concat(cur.split(/[ '"]/).filter(item=>{
+          return pre.concat(cur.split(/[ '"{:]/).filter(item=>{
             return /\d+$/.test(item)
           }))
         }, [])
@@ -142,6 +144,10 @@ ${c}`
         if (req.url=='/refresh' && init) {
           init = false
           const tempContent = fs.readFileSync(autoCSSFile, 'utf-8')
+          if (!tempContent) {
+            next()
+            return
+          }
           const tempContentArr = tempContent.split('}\n')
           const finalArr = tempContentArr.reduce((pre, cur)=>{
             if (allClassName.includes(cur.split(' ').find(item=>{return item !== ''}))) pre.push(cur.trim())
