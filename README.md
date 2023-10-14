@@ -7,21 +7,35 @@ Then the plugin will generate the css class '.w88 { width: 88px }' in '/src/auto
 
 # 1 How to use the pluging.
 
-```//vite.config.ts
+```
+//vite.config.ts
 ...
 import {autoClassPlugin} from 'vite-plugin-vue-autoclass'
 
 export default defineConfig({
-  plugins: [vue(), autoClassPlugin({
-    mainjsFile: 'main.ts'
-  })],
+  plugins: [
+    vue(), 
+    autoClassPlugin({
+      mainjsFile: 'main.ts',
+      cssFile: ...,
+      mainUnit: ...
+    })
+  ],
   ...
 )}
+```
+```
+//foo.vue
+...
+<template>
+  <div class="mb20">I'm a margin-bottom 20px div</div>
+</template>
+...
 ```
 
 # 2 Config
 
-You can use options param. the default options as bellow:
+You can use options param, the classType option haven't open by now. Ofcause you can use it without any param like 'plugins: [vue(), **autoClassPlugin()**]', then the plugin will use default options as bellow:
 
 ```
   const defaultOptions = {
@@ -49,7 +63,7 @@ You can use options param. the default options as bellow:
       ml: {key: 'margin-left', unit},
       mr: {key: 'margin-right', unit},
       mt: {key: 'margin-top', unit},
-      mb: {key: 'margin-bottom', unit},
+      mb: {key: 'margin-bottom', unit}, //example
       fs: {key: 'font-size', unit},
       bdr:{key: 'border-radius', unit},
       bdrtl:{key: 'border-top-left-radius', unit},
@@ -67,10 +81,13 @@ You can use options param. the default options as bellow:
   }
 ```
 
-For example: class="mb20" => .mb20 { margin-bottom: 20px }
+For example: class="mb20" => .mb20 { margin-bottom: 20px }. you can check the classType option and will find **mb** means the css property **margin-bottom**.
+
 
 # 3 Notice
 
-For match correct class/classname, please make sure the correct spell in '.vue/.jsx' for these words bellow:
-  '<template>' '</template>' 'class=' 'className='
-If those words have any empty ' ' inserted in, will miss-match some css class.
+1. For match correct class/classname, please make sure the correct spell in '.vue/.jsx' for these words bellow:
+**<template\>**, **</template\>**, **class=**, **className=**
+If those words have any empty space ' ' inserted in, will miss-match some css class.
+
+2. Please make sure there hasn't another file which name is same with ***mainjsFile*** in your project. 
