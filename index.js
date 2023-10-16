@@ -1,7 +1,7 @@
 
 import fs from 'fs'
 
-export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFile:''}){
+export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFile:'', classTypes:null}){
   let {cssFile, mainUnit, classTypes, mainjsFile} = options
   const unit = mainUnit? mainUnit : 'px'
   const defaultOptions = {
@@ -46,6 +46,13 @@ export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFil
   }
   if (!cssFile) cssFile = defaultOptions.cssFile
   if (!classTypes) classTypes = defaultOptions.classTypes 
+  else {
+    for (let key in defaultOptions.classTypes) {
+      if (!classTypes[key]) {
+        classTypes[key] = defaultOptions.classTypes[key]
+      }
+    }
+  }
   if (!mainjsFile) mainjsFile = defaultOptions.mainjsFile
 
   let config
@@ -73,7 +80,8 @@ export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFil
         if (!autoCSSFile) {
           const tempPath = id.substring(0, id.length - mainjsFile.length)
           autoCSSFile = tempPath + (cssFile? cssFile : 'auto.css')
-          if (!fs.existsSync(autoCSSFile)) fs.writeFileSync(autoCSSFile,'')  
+          if (fs.existsSync(autoCSSFile)) fs.unlinkSync(autoCSSFile)
+          fs.writeFileSync(autoCSSFile,'')  
         }
       
         //由于auto.css为自动生成，每个项目成员开发者都有可能生成新的不同的css类，容易产生代码冲突，所以在gitignore中将其屏蔽
@@ -143,17 +151,7 @@ ${c}`
         // console.log(req.url)        
         if (req.url=='/refresh' && init) {
           init = false
-          const tempContent = fs.readFileSync(autoCSSFile, 'utf-8')
-          if (!tempContent) {
-            next()
-            return
-          }
-          const tempContentArr = tempContent.split('}\n')
-          const finalArr = tempContentArr.reduce((pre, cur)=>{
-            if (allClassName.includes(cur.split(' ').find(item=>{return item !== ''}))) pre.push(cur.trim())
-            return pre
-          }, [])
-          fs.writeFileSync(autoCSSFile, finalArr.join('}\n'))
+          
           server.moduleGraph.urlToModuleMap.forEach((value, key)=>{
             if (key.includes(cssFile))
             server.reloadModule(value)

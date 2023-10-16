@@ -35,15 +35,15 @@ export default defineConfig({
 
 # 2 Config
 
-You can use options param, the classType option haven't open by now. Ofcause you can use it without any param like 'plugins: [vue(), **autoClassPlugin()**]', then the plugin will use default options as bellow:
+You can use options param. Ofcause you can use it without any param like 'plugins: [vue(), **autoClassPlugin()**]', then the plugin will use default options as bellow:
 
 ```
   const defaultOptions = {
     cssFile : 'auto.css',  //the generate css file name, the path will be '/src'
-    mainUnit: 'px',
+    mainUnit: 'px', //you also can set the param to be 'rem' or 'em'
     mainjsFile: 'main.js', //the Vue/React entry file name
     classTypes: {
-      w: {key: 'width', unit},
+      w: {key: 'width', unit}, //unit: mainUnit
       h: {key: 'height', unit},
       lh: {key: 'line-height', unit},
       minh: {key: 'min-height', unit},
@@ -91,3 +91,4 @@ For example: class="mb20" => .mb20 { margin-bottom: 20px }. you can check the cl
 If those words have any empty space ' ' inserted in, will miss-match some css class.
 
 2. Please make sure there hasn't another file which name is same with ***mainjsFile*** in your project. 
+3. Please do not modify the auto generated css file to avoid some css class missed and format mistake.
