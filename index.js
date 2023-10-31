@@ -113,7 +113,7 @@ export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFil
       else if (['.vue', '.jsx', '.tsx'].includes(id.substring(id.length-4))) {
         if (!autoCSSFile) return code
         autoClassContent = fs.readFileSync(autoCSSFile)
-        const templateStr = id.substring(id.length-4) == '.vue' ? code.substring(code.indexOf('<template>'), code.lastIndexOf('</template>')) : code.substring(code.indexOf('return'))
+        const templateStr = id.substring(id.length-4) == '.vue' ? code.substring(code.indexOf('<template>'), code.lastIndexOf('</template>')) : code
         const classStr1 = id.substring(id.length-4) == '.vue' ? (templateStr.match(/class=".*?"/g) ?? []) : (templateStr.match(/className=".*?"/g) ?? [])
         const classStr2 = id.substring(id.length-4) == '.vue' ? (templateStr.match(/class='.*?'/g) ?? []) : (templateStr.match(/className='.*?'/g) ?? [])
         let classArr = classStr1.concat(classStr2).reduce((pre,cur)=>{

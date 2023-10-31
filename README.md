@@ -10,7 +10,7 @@ Then the plugin will generate the css class '.w88 { width: 88px }' in '/src/auto
 ```
 //vite.config.ts
 ...
-import {autoClassPlugin} from 'vite-plugin-vue-autoclass'
+import {autoClassPlugin} from 'vite-plugin-autoclass'
 
 export default defineConfig({
   plugins: [
@@ -18,6 +18,9 @@ export default defineConfig({
     autoClassPlugin({
       mainjsFile: 'main.ts',
       cssFile: ...,
+      classTypes: {
+        remw: {key: 'width', unit: 'rem'}
+      },
       mainUnit: ...
     })
   ],
