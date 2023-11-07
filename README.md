@@ -1,3 +1,4 @@
+https://github.com/tarzandong/autoCSSClass.git
 This is a vite pluging for vue/React project.
 
 With it you can add some post-css style class in template tag. like follow code:
@@ -19,7 +20,7 @@ export default defineConfig({
       mainjsFile: 'main.ts',
       cssFile: ...,
       classTypes: {
-        remw: {key: 'width', unit: 'rem'}
+        myw: {key: 'width', unit: 'px'}
       },
       mainUnit: ...
     })
@@ -46,7 +47,7 @@ You can use options param. Ofcause you can use it without any param like 'plugin
     mainUnit: 'px', //you also can set the param to be 'rem' or 'em'
     mainjsFile: 'main.js', //the Vue/React entry file name
     classTypes: {
-      w: {key: 'width', unit}, //unit: mainUnit
+      w: {key: 'width', unit},
       h: {key: 'height', unit},
       lh: {key: 'line-height', unit},
       minh: {key: 'min-height', unit},
@@ -57,6 +58,10 @@ You can use options param. Ofcause you can use it without any param like 'plugin
       vh: {key: 'height', unit: 'vh'},
       pw: {key: 'width', unit: '%'},
       ph: {key: 'height', unit: '%'},
+      emw: {key: 'width', unit: 'em'},
+      remw: {key: 'width', unit: 'rem'},
+      emh: {key: 'height', unit: 'em'},
+      remh: {key: 'height', unit:'rem'},
       p: {key: 'padding', unit},
       pl: {key: 'padding-left', unit},
       pr: {key: 'padding-right', unit},
@@ -66,7 +71,7 @@ You can use options param. Ofcause you can use it without any param like 'plugin
       ml: {key: 'margin-left', unit},
       mr: {key: 'margin-right', unit},
       mt: {key: 'margin-top', unit},
-      mb: {key: 'margin-bottom', unit}, //example
+      mb: {key: 'margin-bottom', unit},
       fs: {key: 'font-size', unit},
       bdr:{key: 'border-radius', unit},
       bdrtl:{key: 'border-top-left-radius', unit},
@@ -79,7 +84,8 @@ You can use options param. Ofcause you can use it without any param like 'plugin
       lft: {key: 'left', unit},
       rgt: {key: 'right', unit},
       top: {key: 'top', unit},
-      btm: {key: 'bottom', unit}
+      btm: {key: 'bottom', unit},
+      gap: {key: 'gap', unit}
     }
   }
 ```

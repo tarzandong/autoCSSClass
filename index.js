@@ -19,6 +19,10 @@ export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFil
       vh: {key: 'height', unit: 'vh'},
       pw: {key: 'width', unit: '%'},
       ph: {key: 'height', unit: '%'},
+      emw: {key: 'width', unit: 'em'},
+      remw: {key: 'width', unit: 'rem'},
+      emh: {key: 'height', unit: 'em'},
+      remh: {key: 'height', unit:'rem'},
       p: {key: 'padding', unit},
       pl: {key: 'padding-left', unit},
       pr: {key: 'padding-right', unit},
@@ -41,7 +45,8 @@ export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFil
       lft: {key: 'left', unit},
       rgt: {key: 'right', unit},
       top: {key: 'top', unit},
-      btm: {key: 'bottom', unit}
+      btm: {key: 'bottom', unit},
+      gap: {key: 'gap', unit}
     }
   }
   if (!cssFile) cssFile = defaultOptions.cssFile
@@ -81,7 +86,8 @@ export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFil
           const tempPath = id.substring(0, id.length - mainjsFile.length)
           autoCSSFile = tempPath + (cssFile? cssFile : 'auto.css')
           if (fs.existsSync(autoCSSFile)) fs.unlinkSync(autoCSSFile)
-          fs.writeFileSync(autoCSSFile,'')  
+          fs.writeFileSync(autoCSSFile,`/*auto generated, do not edit*/
+        `)  
         }
       
         //由于auto.css为自动生成，每个项目成员开发者都有可能生成新的不同的css类，容易产生代码冲突，所以在gitignore中将其屏蔽
