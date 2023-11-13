@@ -1,12 +1,13 @@
 {
   "name": "vite-plugin-autoclass",
-  "version": "1.1.9",
+  "version": "1.2.0",
   "description": "Auto generate post-css style class for your project",
   "main": "index.js",
   "scripts": {
     "test": "test"
   },
   "type": "module",
+  "types": "index.d.ts",
   "keywords": [
     "Vue",
     "React",
