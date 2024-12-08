@@ -46,7 +46,15 @@ export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFil
       rgt: {key: 'right', unit},
       top: {key: 'top', unit},
       btm: {key: 'bottom', unit},
-      gap: {key: 'gap', unit}
+      gap: {key: 'gap', unit},
+      bc: {key: 'background-color', unit: ''}, //颜色类用'-'分割，因为颜色值是十六位编码，无法用数字类型去判断
+      tc: {key: 'color', unit: ''},
+      ta: {key: 'text-align', unit: ['left', 'center', 'right']},
+      ai: {key: 'align-items', unit: ['start', 'center', 'end']},
+      jc: {key: 'justify-content', unit: ['start', 'center', 'end', 'space-between', 'space-arround']},
+      dp: {key: 'display', unit: ['flex', 'block', 'none']},
+      fxd: {key: 'flex-direction', unit: ['row', 'column']},
+      fxw: {key: 'flex-wrap', unit: ['wrap', 'no-wrap']}
     }
   }
   if (!cssFile) cssFile = defaultOptions.cssFile
@@ -122,21 +130,26 @@ export function autoClassPlugin(options = {cssFile : '', mainUnit: '', mainjsFil
         const templateStr = id.substring(id.length-4) == '.vue' ? code.substring(code.indexOf('<template>'), code.lastIndexOf('</template>')) : code
         const classStr1 = id.substring(id.length-4) == '.vue' ? (templateStr.match(/class=".*?"/g) ?? []) : (templateStr.match(/className=".*?"/g) ?? [])
         const classStr2 = id.substring(id.length-4) == '.vue' ? (templateStr.match(/class='.*?'/g) ?? []) : (templateStr.match(/className='.*?'/g) ?? [])
+        
         let classArr = classStr1.concat(classStr2).reduce((pre,cur)=>{
           return pre.concat(cur.split(/[ '"{:]/).filter(item=>{
-            return /\d+$/.test(item)
+            return /\d+$/.test(item) || item.includes('-')
           }))
         }, [])
-        
         const autoClasss = [...(new Set(classArr))]
         const contentStr = autoClasss.reduce((pre, cur)=>{
-          const label = cur.replaceAll(/\d+/g, '')
+          const isColor = cur.includes('-')
+          const label = isColor ? cur.split('-')[0] : cur.replaceAll(/\d+/g, '')
           if (classTypes[label] && !allClassName.includes(`.${cur}`)) allClassName.push(`.${cur}`)
-          if ( !classTypes[label] || autoClassContent.includes(cur) ) return pre
+          const n = isColor ? cur.split('-')[1] : Number(cur.replaceAll(/\D+/g, '')) //获取数值
+          if ( !classTypes[label] || autoClassContent.includes(cur) || (!isColor && isNaN(Number(n))) ) return pre
           let c = 
 `.${cur} {
-  ${classTypes[label].key}: ${cur.replaceAll(/\D+/g, '')}${classTypes[label].unit}
+  ${ classTypes[label].key }: ${ isColor ?  '#' + n
+  :  typeof classTypes[label].unit === 'object' ? (classTypes[label].unit[n] ?? classTypes[label].unit[0])
+  : cur.replaceAll(/\D+/g, '') + classTypes[label].unit }
 }`
+   if(isColor)       console.log(c)
 return pre+`
 ${c}`
         }, '')
